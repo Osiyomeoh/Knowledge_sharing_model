@@ -3,6 +3,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Web3Provider } from './context/web3Context'; // Corrected capitalization
+import WalletCheck from './components/common/walletCheck';
 
 // Pages
 import HomePage from './pages/HomePage';
@@ -21,6 +22,7 @@ import ErrorPage from './pages/ErrorPage';
 const App: React.FC = () => {
   return (
     <Web3Provider>
+      <WalletCheck />
       <Router>
         <Routes>
           <Route path="/" element={<HomePage />} />

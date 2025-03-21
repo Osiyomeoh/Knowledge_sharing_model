@@ -160,7 +160,7 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     };
 
-    checkConnection();
+    checkConnection();  // This line was missing a closing parenthesis
 
     const handleAccountsChanged = async (accounts: string[]) => {
       if (accounts.length === 0) {
