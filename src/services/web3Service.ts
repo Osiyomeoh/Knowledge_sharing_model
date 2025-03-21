@@ -27,37 +27,48 @@ class Web3Service {
   
   // Modified constructor for src/services/web3Service.ts
 
-constructor(
+  constructor(
     private userRegistryAddress: string, 
     private documentManagerAddress: string, 
     private collaborationSpaceAddress: string
   ) {
     try {
-      // Check if ethereum is available
+      // Check if ethereum is available, but don't show message yet
       if (typeof window !== 'undefined' && window.ethereum) {
         this.provider = new ethers.providers.Web3Provider(window.ethereum);
         this.signer = this.provider.getSigner();
         this.userRegistryContract = new ethers.Contract(userRegistryAddress, UserRegistryABI.abi, this.signer);
         this.documentManagerContract = new ethers.Contract(documentManagerAddress, DocumentManagerABI.abi, this.signer);
         this.collaborationSpaceContract = new ethers.Contract(collaborationSpaceAddress, CollaborationSpaceABI.abi, this.signer);
-      } else {
-        // Show MetaMask install message
-        this.showMetaMaskInstallMessage();
       }
+      // Don't show message here
     } catch (error) {
       console.error("Error initializing Web3Service:", error);
-      this.showMetaMaskInstallMessage();
+      // Don't show message here either
     }
   }
-  
   // Add this private method to your class
   private showMetaMaskInstallMessage() {
     if (typeof document !== 'undefined') {
-      document.body.innerHTML = `
-        <div style="padding: 40px; text-align: center; font-family: Arial, sans-serif; line-height: 1.6;">
+      // Create a modal overlay instead of replacing the entire body
+      const modalOverlay = document.createElement('div');
+      modalOverlay.style.position = 'fixed';
+      modalOverlay.style.top = '0';
+      modalOverlay.style.left = '0';
+      modalOverlay.style.width = '100%';
+      modalOverlay.style.height = '100%';
+      modalOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+      modalOverlay.style.zIndex = '9999';
+      modalOverlay.style.display = 'flex';
+      modalOverlay.style.alignItems = 'center';
+      modalOverlay.style.justifyContent = 'center';
+      
+      modalOverlay.innerHTML = `
+        <div style="background-color: white; padding: 40px; text-align: center; font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+          <button style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 24px; cursor: pointer;" onclick="this.parentElement.parentElement.remove()">×</button>
           <h2 style="color: #333; font-size: 24px; margin-bottom: 20px;">Web3 Wallet Required</h2>
           <p style="font-size: 16px; color: #555; margin-bottom: 20px;">
-            This application requires a Web3 wallet like MetaMask to function properly.
+            This feature requires a Web3 wallet like MetaMask to function properly.
           </p>
           <div style="max-width: 500px; margin: 0 auto; border: 1px solid #ddd; padding: 20px; border-radius: 8px; background-color: #f9f9f9;">
             <p style="font-weight: bold; margin-bottom: 10px;">To use this application:</p>
@@ -94,6 +105,8 @@ constructor(
           ` : ''}
         </div>
       `;
+      
+      document.body.appendChild(modalOverlay);
     }
   }
   // Connection Methods
@@ -367,7 +380,75 @@ constructor(
     const tx = await this.collaborationSpaceContract.unlinkDocument(workspaceId, documentId);
     await tx.wait();
   }
+  public isProviderAvailable(): boolean {
+    return typeof window !== 'undefined' && !!window.ethereum;
+  }
   
+  // Show MetaMask message when needed
+  public showWalletRequiredMessage(): void {
+    this.showMetaMaskInstallMessage();
+  }
+//   private showMetaMaskInstallMessage() {
+//   if (typeof document !== 'undefined') {
+//     // Create a modal overlay instead of replacing the entire body
+//     const modalOverlay = document.createElement('div');
+//     modalOverlay.style.position = 'fixed';
+//     modalOverlay.style.top = '0';
+//     modalOverlay.style.left = '0';
+//     modalOverlay.style.width = '100%';
+//     modalOverlay.style.height = '100%';
+//     modalOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+//     modalOverlay.style.zIndex = '9999';
+//     modalOverlay.style.display = 'flex';
+//     modalOverlay.style.alignItems = 'center';
+//     modalOverlay.style.justifyContent = 'center';
+    
+//     modalOverlay.innerHTML = `
+//       <div style="background-color: white; padding: 40px; text-align: center; font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+//         <button style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 24px; cursor: pointer;" onclick="this.parentElement.parentElement.remove()">×</button>
+//         <h2 style="color: #333; font-size: 24px; margin-bottom: 20px;">Web3 Wallet Required</h2>
+//         <p style="font-size: 16px; color: #555; margin-bottom: 20px;">
+//           This feature requires a Web3 wallet like MetaMask to function properly.
+//         </p>
+//         <div style="max-width: 500px; margin: 0 auto; border: 1px solid #ddd; padding: 20px; border-radius: 8px; background-color: #f9f9f9;">
+//           <p style="font-weight: bold; margin-bottom: 10px;">To use this application:</p>
+//           <ul style="text-align: left; margin-bottom: 20px;">
+//             <li style="margin-bottom: 8px;">Install MetaMask or another Ethereum wallet</li>
+//             <li style="margin-bottom: 8px;">Connect your wallet to the Sepolia testnet</li>
+//             <li>Refresh this page after installation</li>
+//           </ul>
+//           <div>
+//             <a href="https://metamask.io/download/" 
+//                target="_blank" 
+//                style="display: inline-block; background-color: #3498db; color: white; padding: 10px 20px; 
+//                       text-decoration: none; border-radius: 4px; font-weight: bold; margin-bottom: 15px;">
+//               Download MetaMask
+//             </a>
+//           </div>
+//           <button onclick="window.location.reload()" 
+//                   style="border: none; background-color: #eee; padding: 10px 20px; 
+//                          border-radius: 4px; cursor: pointer; font-weight: bold;">
+//             Refresh Page
+//           </button>
+//         </div>
+//         ${/iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? `
+//           <div style="margin-top: 20px; padding: 15px; border: 1px solid #e0c3c3; 
+//                       background-color: #fff8f8; border-radius: 8px; color: #d63939; max-width: 500px; margin: 20px auto;">
+//             <p style="font-weight: bold;">For Mobile Users:</p>
+//             <p>You can access this application by using:</p>
+//             <ul style="text-align: left; margin-top: 10px;">
+//               <li style="margin-bottom: 8px;">MetaMask Mobile Browser</li>
+//               <li style="margin-bottom: 8px;">Trust Wallet Browser</li>
+//               <li>Coinbase Wallet Browser</li>
+//             </ul>
+//           </div>
+//         ` : ''}
+//       </div>
+//     `;
+    
+//     document.body.appendChild(modalOverlay);
+//   }
+// }
   async getWorkspaceDocuments(workspaceId: number): Promise<WorkspaceDocument[]> {
     const documents = await this.collaborationSpaceContract.getWorkspaceDocuments(workspaceId);
     return documents.map((doc: any) => ({

@@ -61,76 +61,76 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
   // Check for browser/device compatibility
  // Update this useEffect in your Web3Context.tsx
 
-useEffect(() => {
-    const checkBrowserCompatibility = () => {
-      // First check if ethereum provider exists
-      const hasProvider = typeof window.ethereum !== 'undefined';
+// useEffect(() => {
+//     const checkBrowserCompatibility = () => {
+//       // First check if ethereum provider exists
+//       const hasProvider = typeof window.ethereum !== 'undefined';
       
-      if (!hasProvider) {
-        // No provider available - display helpful message
-        // Make this message more visually appealing
-        document.body.innerHTML = `
-          <div style="padding: 40px; text-align: center; font-family: Arial, sans-serif; line-height: 1.6;">
-            <h2 style="color: #333; font-size: 24px; margin-bottom: 20px;">Web3 Wallet Required</h2>
-            <p style="font-size: 16px; color: #555; margin-bottom: 20px;">
-              This application requires a Web3 wallet like MetaMask to function properly.
-            </p>
-            <div style="max-width: 500px; margin: 0 auto; border: 1px solid #ddd; padding: 20px; border-radius: 8px; background-color: #f9f9f9;">
-              <p style="font-weight: bold; margin-bottom: 10px;">To use this application:</p>
-              <ul style="text-align: left; margin-bottom: 20px;">
-                <li style="margin-bottom: 8px;">Install MetaMask or another Ethereum wallet</li>
-                <li style="margin-bottom: 8px;">Connect your wallet to the Sepolia testnet</li>
-                <li>Refresh this page after installation</li>
-              </ul>
-              <div>
-                <a href="https://metamask.io/download/" 
-                   target="_blank" 
-                   style="display: inline-block; background-color: #3498db; color: white; padding: 10px 20px; 
-                          text-decoration: none; border-radius: 4px; font-weight: bold; margin-bottom: 15px;">
-                  Download MetaMask
-                </a>
-              </div>
-              <button onclick="window.location.reload()" 
-                      style="border: none; background-color: #eee; padding: 10px 20px; 
-                             border-radius: 4px; cursor: pointer; font-weight: bold;">
-                Refresh Page
-              </button>
-            </div>
-          </div>
-        `;
+//       if (!hasProvider) {
+//         // No provider available - display helpful message
+//         // Make this message more visually appealing
+//         document.body.innerHTML = `
+//           <div style="padding: 40px; text-align: center; font-family: Arial, sans-serif; line-height: 1.6;">
+//             <h2 style="color: #333; font-size: 24px; margin-bottom: 20px;">Web3 Wallet Required</h2>
+//             <p style="font-size: 16px; color: #555; margin-bottom: 20px;">
+//               This application requires a Web3 wallet like MetaMask to function properly.
+//             </p>
+//             <div style="max-width: 500px; margin: 0 auto; border: 1px solid #ddd; padding: 20px; border-radius: 8px; background-color: #f9f9f9;">
+//               <p style="font-weight: bold; margin-bottom: 10px;">To use this application:</p>
+//               <ul style="text-align: left; margin-bottom: 20px;">
+//                 <li style="margin-bottom: 8px;">Install MetaMask or another Ethereum wallet</li>
+//                 <li style="margin-bottom: 8px;">Connect your wallet to the Sepolia testnet</li>
+//                 <li>Refresh this page after installation</li>
+//               </ul>
+//               <div>
+//                 <a href="https://metamask.io/download/" 
+//                    target="_blank" 
+//                    style="display: inline-block; background-color: #3498db; color: white; padding: 10px 20px; 
+//                           text-decoration: none; border-radius: 4px; font-weight: bold; margin-bottom: 15px;">
+//                   Download MetaMask
+//                 </a>
+//               </div>
+//               <button onclick="window.location.reload()" 
+//                       style="border: none; background-color: #eee; padding: 10px 20px; 
+//                              border-radius: 4px; cursor: pointer; font-weight: bold;">
+//                 Refresh Page
+//               </button>
+//             </div>
+//           </div>
+//         `;
         
-        // Detect if it's a mobile device to provide more specific instructions
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-        if (isMobile) {
-          // Add mobile-specific instructions
-          const instructionsElement = document.createElement('div');
-          instructionsElement.style.marginTop = '20px';
-          instructionsElement.style.padding = '15px';
-          instructionsElement.style.border = '1px solid #e0c3c3';
-          instructionsElement.style.backgroundColor = '#fff8f8';
-          instructionsElement.style.borderRadius = '8px';
-          instructionsElement.style.color = '#d63939';
-          instructionsElement.innerHTML = `
-            <p style="font-weight: bold;">For Mobile Users:</p>
-            <p>You can access this application by using:</p>
-            <ul style="text-align: left; margin-top: 10px;">
-              <li style="margin-bottom: 8px;">MetaMask Mobile Browser</li>
-              <li style="margin-bottom: 8px;">Trust Wallet Browser</li>
-              <li>Coinbase Wallet Browser</li>
-            </ul>
-          `;
+//         // Detect if it's a mobile device to provide more specific instructions
+//         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+//         if (isMobile) {
+//           // Add mobile-specific instructions
+//           const instructionsElement = document.createElement('div');
+//           instructionsElement.style.marginTop = '20px';
+//           instructionsElement.style.padding = '15px';
+//           instructionsElement.style.border = '1px solid #e0c3c3';
+//           instructionsElement.style.backgroundColor = '#fff8f8';
+//           instructionsElement.style.borderRadius = '8px';
+//           instructionsElement.style.color = '#d63939';
+//           instructionsElement.innerHTML = `
+//             <p style="font-weight: bold;">For Mobile Users:</p>
+//             <p>You can access this application by using:</p>
+//             <ul style="text-align: left; margin-top: 10px;">
+//               <li style="margin-bottom: 8px;">MetaMask Mobile Browser</li>
+//               <li style="margin-bottom: 8px;">Trust Wallet Browser</li>
+//               <li>Coinbase Wallet Browser</li>
+//             </ul>
+//           `;
           
-          // Get the container we created earlier
-          const container = document.querySelector('div[style*="padding: 40px"]');
-          if (container) {
-            container.appendChild(instructionsElement);
-          }
-        }
-      }
-    };
+//           // Get the container we created earlier
+//           const container = document.querySelector('div[style*="padding: 40px"]');
+//           if (container) {
+//             container.appendChild(instructionsElement);
+//           }
+//         }
+//       }
+//     };
     
-    checkBrowserCompatibility();
-  }, []);
+//     checkBrowserCompatibility();
+//   }, []);
 
   // Check current network
   const checkNetwork = async () => {
@@ -206,33 +206,38 @@ useEffect(() => {
 
   useEffect(() => {
     const checkConnection = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        if (!window.ethereum) {
-          setError('MetaMask is not installed');
-          return;
-        }
-        
-        await checkNetwork();
-        
-        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
-        if (accounts.length > 0) {
-          setAddress(accounts[0]);
-          setIsConnected(true);
+        try {
+          setLoading(true);
+          setError(null);
           
-          if (isCorrectNetwork) {
-            await checkUserRegistration(accounts[0]);
+          if (typeof window.ethereum === 'undefined') {
+            // Just set isConnected to false and continue loading the app
+            setIsConnected(false);
+            return; // Don't set an error - allow app to load normally
           }
+          
+          // Rest of your function stays the same
+          await checkNetwork();
+          
+          const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+          if (accounts.length > 0) {
+            setAddress(accounts[0]);
+            setIsConnected(true);
+            
+            if (isCorrectNetwork) {
+              await checkUserRegistration(accounts[0]);
+            }
+          }
+        } catch (err: any) {
+          console.error('Error checking connection:', err);
+          // Don't set error for missing provider
+          if (window.ethereum) {
+            setError('Failed to connect to wallet: ' + err.message);
+          }
+        } finally {
+          setLoading(false);
         }
-      } catch (err: any) {
-        console.error('Error checking connection:', err);
-        setError('Failed to connect to wallet: ' + err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+      };
 
     checkConnection();
 
@@ -299,8 +304,8 @@ useEffect(() => {
   };
 
   const connectWallet = async () => {
-    if (!window.ethereum) {
-      setError('Please install MetaMask to use this application');
+    if (!web3Service.isProviderAvailable()) {
+      //web3Service.showWalletRequiredMessage();
       return;
     }
     

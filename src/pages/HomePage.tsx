@@ -1,6 +1,6 @@
 // src/pages/HomePage.tsx
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useWeb3 } from '../context/web3Context';
 import Layout from '../components/layout/Layout';
@@ -8,6 +8,20 @@ import Button from '../components/common/Button';
 
 const HomePage: React.FC = () => {
   const { isConnected, connectWallet, isRegistered } = useWeb3();
+  const [showWalletModal, setShowWalletModal] = useState(false);
+
+  const handleConnectWallet = async () => {
+    // Check if ethereum is available
+    if (typeof window.ethereum === 'undefined') {
+      setShowWalletModal(true);
+    } else {
+      try {
+        await connectWallet();
+      } catch (error) {
+        console.error('Connection error:', error);
+      }
+    }
+  };
 
   return (
     <Layout>
@@ -24,7 +38,7 @@ const HomePage: React.FC = () => {
             
             {!isConnected ? (
               <Button 
-                onClick={connectWallet}
+                onClick={handleConnectWallet}
                 variant="primary"
                 size="lg"
                 className="px-8"
@@ -125,7 +139,7 @@ const HomePage: React.FC = () => {
             <div className="flex justify-center">
               {!isConnected ? (
                 <Button 
-                  onClick={connectWallet}
+                  onClick={handleConnectWallet}
                   variant="secondary"
                   size="lg"
                   className="px-8 bg-white text-blue-600 hover:bg-gray-100"
@@ -157,6 +171,40 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </div>
+      
+      {/* Wallet Required Modal */}
+      {showWalletModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg max-w-md">
+            <div className="flex justify-between items-start mb-4">
+              <h3 className="text-xl font-bold">Web3 Wallet Required</h3>
+              <button 
+                onClick={() => setShowWalletModal(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                ✕
+              </button>
+            </div>
+            <p className="mb-4">This application requires a Web3 wallet like MetaMask to access blockchain features.</p>
+            <div className="mb-4">
+              <a 
+                href="https://metamask.io/download/" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full bg-blue-600 text-white text-center py-2 px-4 rounded hover:bg-blue-700"
+              >
+                Download MetaMask
+              </a>
+            </div>
+            <button
+              onClick={() => setShowWalletModal(false)}
+              className="block w-full bg-gray-200 text-gray-800 text-center py-2 px-4 rounded hover:bg-gray-300"
+            >
+              Continue Browsing
+            </button>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 };

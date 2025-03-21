@@ -1,6 +1,6 @@
 // src/components/layout/Navbar.tsx
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useWeb3 } from '../../context/web3Context';
 import { formatAddress } from '../../utils/formatters';
@@ -10,6 +10,41 @@ const Navbar: React.FC = () => {
   const { address, isConnected, connectWallet, isRegistered, userProfile } = useWeb3();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const [showWalletModal, setShowWalletModal] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
+
+  const handleConnectWallet = async () => {
+    // Prevent multiple clicks
+    if (isConnecting) return;
+    
+    setIsConnecting(true);
+    
+    try {
+      console.log("Attempting to connect wallet...");
+      if (typeof window !== 'undefined' && typeof window.ethereum === 'undefined') {
+        console.log("No wallet detected, showing modal");
+        setShowWalletModal(true);
+        return;
+      }
+      
+      // Call the connect function from context
+      await connectWallet();
+      console.log("Wallet connected successfully");
+    } catch (error) {
+      console.error('Connection error:', error);
+      // Show the wallet modal if connection fails
+      setShowWalletModal(true);
+    } finally {
+      setIsConnecting(false);
+    }
+  };
+
+  // Reset connecting state if component unmounts during connection
+  useEffect(() => {
+    return () => {
+      setIsConnecting(false);
+    };
+  }, []);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -18,6 +53,11 @@ const Navbar: React.FC = () => {
   const isActive = (path: string) => {
     return location.pathname === path;
   };
+
+  // Debug logging to check values
+  useEffect(() => {
+    console.log("Wallet connection state:", { isConnected, isRegistered, address });
+  }, [isConnected, isRegistered, address]);
 
   return (
     <nav className="bg-gray-800 px-4 py-3 shadow-md">
@@ -84,8 +124,13 @@ const Navbar: React.FC = () => {
                 </span>
               </div>
             ) : (
-              <Button onClick={connectWallet} variant="primary" size="sm">
-                Connect Wallet
+              <Button 
+                onClick={handleConnectWallet}
+                variant="primary" 
+                size="sm"
+                disabled={isConnecting}
+              >
+                {isConnecting ? 'Connecting...' : 'Connect Wallet'}
               </Button>
             )}
           </div>
@@ -95,6 +140,8 @@ const Navbar: React.FC = () => {
             <button
               onClick={toggleMobileMenu}
               className="text-gray-300 hover:text-white focus:outline-none"
+              aria-expanded={isMobileMenuOpen}
+              aria-label="Toggle menu"
             >
               <svg
                 className="h-6 w-6"
@@ -191,19 +238,45 @@ const Navbar: React.FC = () => {
                 </div>
               ) : (
                 <button
-                  onClick={() => {
-                    connectWallet();
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium"
+                  onClick={handleConnectWallet}
+                  className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium disabled:opacity-70 disabled:cursor-not-allowed"
+                  disabled={isConnecting}
                 >
-                  Connect Wallet
+                  {isConnecting ? 'Connecting...' : 'Connect Wallet'}
                 </button>
               )}
             </div>
           </div>
         )}
       </div>
+
+      {/* Wallet Modal */}
+      {showWalletModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg max-w-md w-full">
+            <h2 className="text-xl font-bold mb-4">Wallet Connection Required</h2>
+            <p className="mb-4">
+              You need a Web3 wallet like MetaMask to use this application. Please install a compatible wallet to continue.
+            </p>
+            <div className="flex justify-between">
+              <a
+                href="https://metamask.io/download/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+              >
+                Get MetaMask
+              </a>
+              <button
+                onClick={() => setShowWalletModal(false)}
+                className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };

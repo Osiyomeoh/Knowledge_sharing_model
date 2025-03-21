@@ -22,7 +22,7 @@ import ErrorPage from './pages/ErrorPage';
 const App: React.FC = () => {
   return (
     <Web3Provider>
-      <WalletCheck />
+      
       <Router>
         <Routes>
           <Route path="/" element={<HomePage />} />
