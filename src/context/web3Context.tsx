@@ -58,6 +58,28 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isCorrectNetwork, setIsCorrectNetwork] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Check for browser/device compatibility
+  useEffect(() => {
+    const checkBrowserCompatibility = () => {
+      // Check if on mobile
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      
+      // If mobile but no ethereum provider
+      if (isMobile && !window.ethereum) {
+        // Display helpful message instead of blank screen
+        document.body.innerHTML = `
+          <div style="padding: 20px; text-align: center;">
+            <h2>Web3 Not Available</h2>
+            <p>This app requires a Web3 wallet like MetaMask to function.</p>
+            <p>Please install a mobile wallet browser like MetaMask Mobile, Trust Wallet, or Coinbase Wallet to use this application.</p>
+          </div>
+        `;
+      }
+    };
+    
+    checkBrowserCompatibility();
+  }, []);
+
   // Check current network
   const checkNetwork = async () => {
     try {
@@ -160,7 +182,7 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     };
 
-    checkConnection();  // This line was missing a closing parenthesis
+    checkConnection();
 
     const handleAccountsChanged = async (accounts: string[]) => {
       if (accounts.length === 0) {
