@@ -19,24 +19,83 @@ import {
 } from '../types/contracts';
 
 class Web3Service {
-  private provider: ethers.providers.Web3Provider;
-  private signer: ethers.Signer;
-  private userRegistryContract: ethers.Contract;
-  private documentManagerContract: ethers.Contract;
-  private collaborationSpaceContract: ethers.Contract;
+  private provider!: ethers.providers.Web3Provider;
+  private signer!: ethers.Signer;
+  private userRegistryContract!: ethers.Contract;
+  private documentManagerContract!: ethers.Contract;
+  private collaborationSpaceContract!: ethers.Contract;
   
-  constructor(
+  // Modified constructor for src/services/web3Service.ts
+
+constructor(
     private userRegistryAddress: string, 
     private documentManagerAddress: string, 
     private collaborationSpaceAddress: string
   ) {
-    this.provider = new ethers.providers.Web3Provider(window.ethereum);
-    this.signer = this.provider.getSigner();
-    this.userRegistryContract = new ethers.Contract(userRegistryAddress, UserRegistryABI.abi, this.signer);
-    this.documentManagerContract = new ethers.Contract(documentManagerAddress, DocumentManagerABI.abi, this.signer);
-    this.collaborationSpaceContract = new ethers.Contract(collaborationSpaceAddress, CollaborationSpaceABI.abi, this.signer);
+    try {
+      // Check if ethereum is available
+      if (typeof window !== 'undefined' && window.ethereum) {
+        this.provider = new ethers.providers.Web3Provider(window.ethereum);
+        this.signer = this.provider.getSigner();
+        this.userRegistryContract = new ethers.Contract(userRegistryAddress, UserRegistryABI.abi, this.signer);
+        this.documentManagerContract = new ethers.Contract(documentManagerAddress, DocumentManagerABI.abi, this.signer);
+        this.collaborationSpaceContract = new ethers.Contract(collaborationSpaceAddress, CollaborationSpaceABI.abi, this.signer);
+      } else {
+        // Show MetaMask install message
+        this.showMetaMaskInstallMessage();
+      }
+    } catch (error) {
+      console.error("Error initializing Web3Service:", error);
+      this.showMetaMaskInstallMessage();
+    }
   }
-
+  
+  // Add this private method to your class
+  private showMetaMaskInstallMessage() {
+    if (typeof document !== 'undefined') {
+      document.body.innerHTML = `
+        <div style="padding: 40px; text-align: center; font-family: Arial, sans-serif; line-height: 1.6;">
+          <h2 style="color: #333; font-size: 24px; margin-bottom: 20px;">Web3 Wallet Required</h2>
+          <p style="font-size: 16px; color: #555; margin-bottom: 20px;">
+            This application requires a Web3 wallet like MetaMask to function properly.
+          </p>
+          <div style="max-width: 500px; margin: 0 auto; border: 1px solid #ddd; padding: 20px; border-radius: 8px; background-color: #f9f9f9;">
+            <p style="font-weight: bold; margin-bottom: 10px;">To use this application:</p>
+            <ul style="text-align: left; margin-bottom: 20px;">
+              <li style="margin-bottom: 8px;">Install MetaMask or another Ethereum wallet</li>
+              <li style="margin-bottom: 8px;">Connect your wallet to the Sepolia testnet</li>
+              <li>Refresh this page after installation</li>
+            </ul>
+            <div>
+              <a href="https://metamask.io/download/" 
+                 target="_blank" 
+                 style="display: inline-block; background-color: #3498db; color: white; padding: 10px 20px; 
+                        text-decoration: none; border-radius: 4px; font-weight: bold; margin-bottom: 15px;">
+                Download MetaMask
+              </a>
+            </div>
+            <button onclick="window.location.reload()" 
+                    style="border: none; background-color: #eee; padding: 10px 20px; 
+                           border-radius: 4px; cursor: pointer; font-weight: bold;">
+              Refresh Page
+            </button>
+          </div>
+          ${/iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? `
+            <div style="margin-top: 20px; padding: 15px; border: 1px solid #e0c3c3; 
+                        background-color: #fff8f8; border-radius: 8px; color: #d63939; max-width: 500px; margin: 20px auto;">
+              <p style="font-weight: bold;">For Mobile Users:</p>
+              <p>You can access this application by using:</p>
+              <ul style="text-align: left; margin-top: 10px;">
+                <li style="margin-bottom: 8px;">MetaMask Mobile Browser</li>
+                <li style="margin-bottom: 8px;">Trust Wallet Browser</li>
+                <li>Coinbase Wallet Browser</li>
+              </ul>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+  }
   // Connection Methods
   async connectWallet(): Promise<string> {
     await this.provider.send("eth_requestAccounts", []);
