@@ -18,6 +18,7 @@ import WorkspaceDetailsPage from './pages/workspaces/WorkspaceDetailPage';
 import ThreadPage from './pages/workspaces/ThreadDetail'; // Added full path
 import ExplorePage from './pages/ExplorePage'; // Added this import
 import ErrorPage from './pages/ErrorPage';
+import DocumentSharePage from './pages/documents/DocumentSharePage';
 
 const App: React.FC = () => {
   return (
@@ -32,6 +33,7 @@ const App: React.FC = () => {
           <Route path="/documents" element={<DocumentsPage />} />
           <Route path="/documents/create" element={<CreateDocumentPage />} />
           <Route path="/documents/:documentId" element={<DocumentDetailsPage />} />
+          <Route path="/documents/:documentId/share" element={<DocumentSharePage />} />
           
           <Route path="/workspaces" element={<WorkspacesPage />} />
           <Route path="/workspaces/create" element={<CreateWorkspacePage />} />
