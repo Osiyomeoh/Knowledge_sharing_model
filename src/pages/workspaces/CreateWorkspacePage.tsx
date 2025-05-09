@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useWeb3 } from '../../context/web3Context';
 import web3Service from '../../services/web3Service';
 import Layout from '../../components/layout/Layout';
-import WorkspaceForm from '../../pages/workspaces/WorkspaceForm';
+import WorkspaceForm from './WorkspaceForm';
 import NotificationCard from '../../components/common/NotificationCard';
 
 const CreateWorkspacePage: React.FC = () => {

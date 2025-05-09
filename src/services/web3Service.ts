@@ -26,7 +26,6 @@ class Web3Service {
   private collaborationSpaceContract!: ethers.Contract;
   
   // Modified constructor for src/services/web3Service.ts
-
   constructor(
     private userRegistryAddress: string, 
     private documentManagerAddress: string, 
@@ -41,12 +40,11 @@ class Web3Service {
         this.documentManagerContract = new ethers.Contract(documentManagerAddress, DocumentManagerABI.abi, this.signer);
         this.collaborationSpaceContract = new ethers.Contract(collaborationSpaceAddress, CollaborationSpaceABI.abi, this.signer);
       }
-      // Don't show message here
     } catch (error) {
       console.error("Error initializing Web3Service:", error);
-      // Don't show message here either
     }
   }
+  
   // Add this private method to your class
   private showMetaMaskInstallMessage() {
     if (typeof document !== 'undefined') {
@@ -109,6 +107,7 @@ class Web3Service {
       document.body.appendChild(modalOverlay);
     }
   }
+  
   // Connection Methods
   async connectWallet(): Promise<string> {
     await this.provider.send("eth_requestAccounts", []);
@@ -380,6 +379,7 @@ class Web3Service {
     const tx = await this.collaborationSpaceContract.unlinkDocument(workspaceId, documentId);
     await tx.wait();
   }
+  
   public isProviderAvailable(): boolean {
     return typeof window !== 'undefined' && !!window.ethereum;
   }
@@ -388,67 +388,7 @@ class Web3Service {
   public showWalletRequiredMessage(): void {
     this.showMetaMaskInstallMessage();
   }
-//   private showMetaMaskInstallMessage() {
-//   if (typeof document !== 'undefined') {
-//     // Create a modal overlay instead of replacing the entire body
-//     const modalOverlay = document.createElement('div');
-//     modalOverlay.style.position = 'fixed';
-//     modalOverlay.style.top = '0';
-//     modalOverlay.style.left = '0';
-//     modalOverlay.style.width = '100%';
-//     modalOverlay.style.height = '100%';
-//     modalOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-//     modalOverlay.style.zIndex = '9999';
-//     modalOverlay.style.display = 'flex';
-//     modalOverlay.style.alignItems = 'center';
-//     modalOverlay.style.justifyContent = 'center';
-    
-//     modalOverlay.innerHTML = `
-//       <div style="background-color: white; padding: 40px; text-align: center; font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-//         <button style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 24px; cursor: pointer;" onclick="this.parentElement.parentElement.remove()">×</button>
-//         <h2 style="color: #333; font-size: 24px; margin-bottom: 20px;">Web3 Wallet Required</h2>
-//         <p style="font-size: 16px; color: #555; margin-bottom: 20px;">
-//           This feature requires a Web3 wallet like MetaMask to function properly.
-//         </p>
-//         <div style="max-width: 500px; margin: 0 auto; border: 1px solid #ddd; padding: 20px; border-radius: 8px; background-color: #f9f9f9;">
-//           <p style="font-weight: bold; margin-bottom: 10px;">To use this application:</p>
-//           <ul style="text-align: left; margin-bottom: 20px;">
-//             <li style="margin-bottom: 8px;">Install MetaMask or another Ethereum wallet</li>
-//             <li style="margin-bottom: 8px;">Connect your wallet to the Sepolia testnet</li>
-//             <li>Refresh this page after installation</li>
-//           </ul>
-//           <div>
-//             <a href="https://metamask.io/download/" 
-//                target="_blank" 
-//                style="display: inline-block; background-color: #3498db; color: white; padding: 10px 20px; 
-//                       text-decoration: none; border-radius: 4px; font-weight: bold; margin-bottom: 15px;">
-//               Download MetaMask
-//             </a>
-//           </div>
-//           <button onclick="window.location.reload()" 
-//                   style="border: none; background-color: #eee; padding: 10px 20px; 
-//                          border-radius: 4px; cursor: pointer; font-weight: bold;">
-//             Refresh Page
-//           </button>
-//         </div>
-//         ${/iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? `
-//           <div style="margin-top: 20px; padding: 15px; border: 1px solid #e0c3c3; 
-//                       background-color: #fff8f8; border-radius: 8px; color: #d63939; max-width: 500px; margin: 20px auto;">
-//             <p style="font-weight: bold;">For Mobile Users:</p>
-//             <p>You can access this application by using:</p>
-//             <ul style="text-align: left; margin-top: 10px;">
-//               <li style="margin-bottom: 8px;">MetaMask Mobile Browser</li>
-//               <li style="margin-bottom: 8px;">Trust Wallet Browser</li>
-//               <li>Coinbase Wallet Browser</li>
-//             </ul>
-//           </div>
-//         ` : ''}
-//       </div>
-//     `;
-    
-//     document.body.appendChild(modalOverlay);
-//   }
-// }
+  
   async getWorkspaceDocuments(workspaceId: number): Promise<WorkspaceDocument[]> {
     const documents = await this.collaborationSpaceContract.getWorkspaceDocuments(workspaceId);
     return documents.map((doc: any) => ({
@@ -458,6 +398,79 @@ class Web3Service {
       addedAt: doc.addedAt.toNumber(),
       addedBy: doc.addedBy
     }));
+  }
+
+  // NEW METHODS FOR THREAD REPLIES
+  
+  // Replace the incorrect addPost method with this implementation
+  async addReplyToThread(
+    threadId: number,
+    workspaceId: number,
+    originalThreadTitle: string,
+    replyContent: string
+  ): Promise<number> {
+    try {
+      // Since there's no direct addPost function in the contract,
+      // we create a new thread that references the original thread
+      const replyTitle = `RE: ${originalThreadTitle} #${Date.now()}`;
+      const { threadId: replyThreadId, postId } = await this.createDiscussionThread(
+        workspaceId,
+        replyTitle,
+        replyContent
+      );
+      
+      // In a production app, you'd want to store this relationship
+      // in a separate database or IPFS, but for now we rely on the title format
+      
+      return postId;
+    } catch (error: any) {
+      console.error("Error replying to thread:", error);
+      throw new Error(error.message || "Failed to reply to thread");
+    }
+  }
+
+  // Get all content for a thread, including replies
+  async getAllThreadContent(
+    originalThreadId: number,
+    workspaceId: number
+  ): Promise<Post[]> {
+    try {
+      // Get all threads in the workspace
+      const allThreads = await this.getWorkspaceThreads(workspaceId);
+      
+      // Get the original thread
+      const originalThread = allThreads.find(t => t.id === originalThreadId);
+      if (!originalThread) {
+        throw new Error("Thread not found");
+      }
+      
+      // Get the original thread posts
+      const originalPosts = await this.getThreadPosts(originalThreadId);
+      
+      // Find reply threads by title pattern
+      const replyThreads = allThreads.filter(t => 
+        t.title.startsWith(`RE: ${originalThread.title}`) ||
+        t.title.includes(`RE: ${originalThread.title} #`)
+      );
+      
+      // Get posts from reply threads
+      const replyPosts: Post[] = [];
+      for (const replyThread of replyThreads) {
+        const threadPosts = await this.getThreadPosts(replyThread.id);
+        // Only take the first post from each reply thread
+        if (threadPosts.length > 0) {
+          replyPosts.push(threadPosts[0]);
+        }
+      }
+      
+      // Combine original and reply posts and sort by creation time
+      const allPosts = [...originalPosts, ...replyPosts].sort((a, b) => a.createdAt - b.createdAt);
+      
+      return allPosts;
+    } catch (error: any) {
+      console.error("Error getting thread content:", error);
+      throw new Error("Failed to load thread content");
+    }
   }
 }
 

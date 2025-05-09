@@ -15,8 +15,8 @@ import DocumentDetailsPage from './pages/documents/DocumentDetailPage'; // Fixed
 import WorkspacesPage from './pages/workspaces/WorkspacesPage'; // Added full path
 import CreateWorkspacePage from './pages/workspaces/CreateWorkspacePage';
 import WorkspaceDetailsPage from './pages/workspaces/WorkspaceDetailPage';
-//import ThreadPage from './pages/workspaces/ThreadPage'; // Added full path
-//import ExplorePage from './pages/ExplorePage'; // Added this import
+import ThreadPage from './pages/workspaces/ThreadDetail'; // Added full path
+import ExplorePage from './pages/ExplorePage'; // Added this import
 import ErrorPage from './pages/ErrorPage';
 
 const App: React.FC = () => {
@@ -36,9 +36,9 @@ const App: React.FC = () => {
           <Route path="/workspaces" element={<WorkspacesPage />} />
           <Route path="/workspaces/create" element={<CreateWorkspacePage />} />
           <Route path="/workspaces/:workspaceId" element={<WorkspaceDetailsPage />} />
-          {/* <Route path="/workspaces/:workspaceId/threads/:threadId" element={<ThreadPage />} />
+         <Route path="/workspaces/:workspaceId/threads/:threadId" element={<ThreadPage />} />
           
-         // <Route path="/explore" element={<ExplorePage />} /> */}
+         <Route path="/explore" element={<ExplorePage />} /> 
           <Route path="*" element={<ErrorPage />} />
         </Routes>
       </Router>

@@ -305,7 +305,7 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const connectWallet = async () => {
     if (!web3Service.isProviderAvailable()) {
-      //web3Service.showWalletRequiredMessage();
+      web3Service.showWalletRequiredMessage();
       return;
     }
     

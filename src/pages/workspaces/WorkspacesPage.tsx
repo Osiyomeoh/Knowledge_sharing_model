@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useWeb3 } from '../../context/web3Context';
 import web3Service from '../../services/web3Service';
 import Layout from '../../components/layout/Layout';
-import WorkspaceCard from '../../pages/workspaces/WorkspaceCard';
+import WorkspaceCard from './WorkspaceCard';
 import Button from '../../components/common/Button';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import NotificationCard from '../../components/common/NotificationCard';
