@@ -43,9 +43,16 @@ const ThreadDetail: React.FC = () => {
       
       setThread(foundThread);
       
-      // Get posts for this thread
-      const threadPosts = await web3Service.getThreadPosts(numThreadId);
-      setPosts(threadPosts);
+      // Get all posts including replies from related threads
+      try {
+        const allPosts = await web3Service.getAllThreadContent(numThreadId, numWorkspaceId);
+        setPosts(allPosts);
+      } catch (postError) {
+        console.error("Error fetching thread posts:", postError);
+        // Fall back to just the original thread posts if the new method fails
+        const threadPosts = await web3Service.getThreadPosts(numThreadId);
+        setPosts(threadPosts);
+      }
       
     } catch (error: any) {
       console.error("Error fetching thread data:", error);
@@ -64,10 +71,15 @@ const ThreadDetail: React.FC = () => {
       setIsSubmitting(true);
       setError(null);
       
-      // This is a placeholder since we don't see an addPost method in your web3Service
-      // You might need to add this method to your service
-      // For now, let's assume it exists
-      await web3Service.addPost(numThreadId, newPostContent);
+      // Use our new method to reply to a thread
+      if (thread) {
+        await web3Service.addReplyToThread(
+          numThreadId,
+          numWorkspaceId,
+          thread.title,
+          newPostContent
+        );
+      }
       
       // Clear form and refresh posts
       setNewPostContent('');
